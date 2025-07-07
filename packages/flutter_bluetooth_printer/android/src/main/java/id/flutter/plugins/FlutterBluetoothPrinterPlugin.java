@@ -70,8 +70,12 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
                         sink.success(data);
                     }
                 } else if (value == BluetoothAdapter.STATE_ON) {
-                    startDiscovery(false);
-                }
+                    if (activity != null) {
+                        startDiscovery(false);
+                    } else {
+                        Log.w("FlutterBluetoothPrinter", "Activity is null. Skipping discovery.");
+                    }
+                }                
             }
         }
     };
@@ -115,6 +119,10 @@ public class FlutterBluetoothPrinterPlugin implements FlutterPlugin, ActivityAwa
     }
 
     private boolean ensurePermission(boolean request) {
+        if (activity == null) {
+            Log.e("FlutterBluetoothPrinter", "Activity is null in ensurePermission()");
+            return false;
+        }        
         if (SDK_INT >= Build.VERSION_CODES.M) {
             if (SDK_INT >= 31) {
                 final boolean bluetooth = activity.checkSelfPermission(Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED;
